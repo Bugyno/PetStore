@@ -1,44 +1,23 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using RestSharp;
+using System.IO;
+using System.Text;
 
 namespace PetStore
 {
     [TestClass]
     public class addNewUser
     {
-        // New instance of Variables and Methods to get access to classes
+        // New instance of Variables to get access to the class
         Variables variables = new Variables();
-        //Methods methods = new Methods();
+        Methods methods = new Methods();
 
         // Successfull adding new user -> expecting response 200
         [TestMethod]
         public void addUser()
         {
-            //Creating Client connection 
-            RestClient restClient = new RestClient(variables.URL);
-
-            //Creating request to get data from server
-            RestRequest restRequest = new RestRequest(variables.userURLPath, Method.POST);
-
-            //Creating testing input data in JSON format
-            restRequest.AddJsonBody(new
-            {
-                id = variables.id,
-                username = variables.username,
-                firstName = variables.firstName,
-                lastName = variables.lastName,
-                email = variables.email,
-                password = variables.password,
-                phone = variables.phone,
-                userStatus = variables.userStatus
-            });
-
-            // Executing request to server and checking server response to the it
-            IRestResponse restResponse = restClient.Execute(restRequest);
-
-            // Extracting output data from received response
-            string response = restResponse.Content;
-
+            string response = methods.addObject(variables.userURLPath);
             // Verifiying reponse
             if (!response.Contains("200"))
             {
@@ -50,36 +29,15 @@ namespace PetStore
     [TestClass]
     public class updateUser
     {
-        // New instance of Variables and Methods to get access to classes
+        // New instance of Variables to get access to the class
         Variables variables = new Variables();
-        //Methods methods = new Methods();
+        Methods methods = new Methods();
 
-        // Successfull updating new user
+        // Successfull updating user -> expecting response 200
         [TestMethod]
-        public void updateAUser()
+        public void updateExistingUserPassword()
         {
-            // Creating Client connection and request to get data from server
-            RestClient restClient = new RestClient(variables.URL);
-            RestRequest restRequest = new RestRequest(variables.userURLPath + variables.username, Method.PUT);
-
-            //Creating updated testing input data in JSON format
-            restRequest.AddJsonBody(new
-            {
-                id = variables.id,
-                username = variables.username,
-                firstName = variables.firstName,
-                lastName = variables.lastName,
-                email = variables.email,
-                password = variables.updatedPassword,
-                phone = variables.phone,
-                userStatus = variables.userStatus
-            });
-
-            // Executing request to server and checking server response to the it
-            IRestResponse restResponse = restClient.Execute(restRequest);
-
-            // Extracting output data from received response
-            string response = restResponse.Content;
+            string response = methods.updateObject(variables.userURLPath, variables.username);
 
             // Verifiying reponse
             if (!response.Contains("200"))
@@ -92,29 +50,17 @@ namespace PetStore
     [TestClass]
     public class removeUser
     {
-        // New instance of Variables and Methods to get access to classes
+        // New instance of Variables to get access to the class
         Variables variables = new Variables();
-        //Methods methods = new Methods();
+        Methods methods = new Methods();
 
+        // Remove existing user -> expacting result 200
         [TestMethod]
-        public void removeAUser()
+        public void removeExistingUser()
         {
-            // New instance of Variables and Methods to get access to classes
-            RestClient restClient = new RestClient(variables.URL);
-            RestRequest restRequest = new RestRequest(variables.userURLPath + variables.username, Method.DELETE);
-
-            //Creating updated testing input data in JSON format
-            restRequest.AddJsonBody(new
-            {
-                username = variables.username
-            });
-
-            // Executing request to server and checking server response to the it
-            IRestResponse restResponse = restClient.Execute(restRequest);
-
-            // Extracting output data from received response
-            string response = restResponse.Content;
-
+            // Calling remove method and storing response
+            string response = methods.removeObject(variables.userURLPath, variables.username);
+            
             // Verifying reponse
             if (!response.Contains("200"))
             {
@@ -126,9 +72,8 @@ namespace PetStore
     [TestClass]
     public class getInfoAboutUser
     {
-        // New instance of Variables and Methods to get access to classes
+        // New instance of Variables to get access to the class
         Variables variables = new Variables();
-        //Methods methods = new Methods();
 
         // Expecting result: User not found. Response 404
         [TestMethod]
@@ -157,7 +102,7 @@ namespace PetStore
         {
             // Creating Client connection and request to get data from server
             RestClient restClient = new RestClient(variables.URL);
-            RestRequest restRequest = new RestRequest(variables.userURLPath + "user1", Method.GET);
+            RestRequest restRequest = new RestRequest(variables.userURLPath + variables.nonExistingUserName, Method.GET);
 
             // Executing request to server and checking server response to the it
             IRestResponse restResponse = restClient.Execute(restRequest);
@@ -215,10 +160,11 @@ namespace PetStore
     {
         // New instance of Variables and Methods to get access to classes
         Variables variables = new Variables();
+
+        // Check for not allowed methods for user opeations
         [TestMethod]
         public void geNotAllowed()
         {
-            
             for (int i = 0; i < variables.methods.GetLength(0); i++)
             {
                 // Creating Client connection and request to get data from server
@@ -236,6 +182,47 @@ namespace PetStore
                 {
                     Assert.Fail(response + "Method " + variables.methods[i].ToString() + " allowed.");
                 }
+            }
+        }
+    }
+
+    [TestClass]
+    public class checkPOSTandGET
+    {
+        // New instance of Variables to get access to the class
+        Variables variables = new Variables();
+        Methods methods = new Methods();
+
+        // Remove existing user -> expacting result 200
+        [TestMethod]
+        public void compareRecords()
+        {
+            // New instance of Variables and Methods to get access to classes
+            RestClient restClient = new RestClient(variables.URL);
+            RestRequest restRequest = new RestRequest(variables.userURLPath, Method.POST);
+
+            restRequest.AddJsonBody(new
+            {
+                id = variables.id,
+                username = variables.username,
+                firstName = variables.firstName,
+                lastName = variables.lastName,
+                email = variables.email,
+                password = variables.password,
+                phone = variables.phone,
+                userStatus = variables.userStatus
+            });
+
+            string postResponse = methods.Serialize(restRequest);
+
+            // Executing request to server and checking server response to the it
+            IRestResponse restResponse = restClient.Execute(restRequest);
+
+            string getResponse = methods.getUserInfo(variables.username);
+
+            if (!postResponse.Equals(getResponse))
+            {
+                Assert.Fail(postResponse + getResponse + " Records are not the same.");
             }
         }
     }
