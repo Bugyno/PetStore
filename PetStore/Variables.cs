@@ -27,7 +27,6 @@ namespace PetStore
         public string phone = "0900000000";
         public int userStatus = 0;
         public string userURLPath = "user/";
-        public string nonExistingUserName = "Bugy";
 
         // Pet variables
         public string petURLPath = "pet/";

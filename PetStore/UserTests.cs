@@ -70,15 +70,43 @@ namespace PetStore
     }
 
     [TestClass]
-    public class getInfoAboutUser
+    public class getInfoAboutUnknownUser
     {
         // New instance of Variables to get access to the class
         Variables variables = new Variables();
 
         // Expecting result: User not found. Response 404
         [TestMethod]
-        public void getUserInfo()
+        public void getUnknownUserInfo()
         {
+            // Creating Client connection and request to get data from server
+            RestClient restClient = new RestClient(variables.URL);
+            RestRequest restRequest = new RestRequest(variables.userURLPath + variables.username.ToUpper(), Method.GET);
+
+            // Executing request to server and checking server response to the it
+            IRestResponse restResponse = restClient.Execute(restRequest);
+
+            // Extracting output data from received response
+            string response = restResponse.Content;
+
+            // Verifiying reponse
+            if (!response.Contains("User not found"))
+            {
+                Assert.Fail(response);
+            }
+        }
+    }
+    
+    [TestClass]
+    public class getInfoAboutKnownUser
+    {
+        // Expecting result: Info about user exists. Reponse 200
+        [TestMethod]
+        public void getUnknownUserInfo()
+        {
+            // New instance of Variables to get access to the class
+            Variables variables = new Variables();
+
             // Creating Client connection and request to get data from server
             RestClient restClient = new RestClient(variables.URL);
             RestRequest restRequest = new RestRequest(variables.userURLPath + variables.username, Method.GET);
@@ -90,67 +118,9 @@ namespace PetStore
             string response = restResponse.Content;
 
             // Verifiying reponse
-            if (!response.Contains("User not found"))
+            if (!response.Contains(variables.password))
             {
-                Assert.Fail(response + "User exists.");
-            }
-        }
-
-        // Expecting result: Invalid username supplied. Response 400
-        [TestMethod]
-        public void getUnknownUserInfo()
-        {
-            // Creating Client connection and request to get data from server
-            RestClient restClient = new RestClient(variables.URL);
-            RestRequest restRequest = new RestRequest(variables.userURLPath + variables.nonExistingUserName, Method.GET);
-
-            // Executing request to server and checking server response to the it
-            IRestResponse restResponse = restClient.Execute(restRequest);
-
-            // Extracting output data from received response
-            string response = restResponse.Content;
-
-            // Verifiying reponse
-            if (!response.Contains("Invalid username supplied"))
-            {
-                Assert.Fail(response + "User exists.");
-            }
-        }
-    }
-
-    [TestClass]
-    public class logInUser
-    {
-        // New instance of Variables and Methods to get access to classes
-        Variables variables = new Variables();
-        //Methods methods = new Methods();
-
-        // Expecting result: Invalid password. Response 400
-        [TestMethod]
-        public void InvalidlogInUser()
-        {
-            // Creating valid user
-            addNewUser user = new addNewUser();
-            user.addUser();
-
-            // Creating Client connection and request to get data from server
-            RestClient restClient = new RestClient(variables.URL);
-            RestRequest restRequest = new RestRequest(variables.userURLPath + "login", Method.GET);
-
-            // Send input data
-            restRequest.AddHeader("username", variables.username);
-            restRequest.AddHeader("password", variables.invalidPassword);
-
-            // Executing request to server and checking server response to the it
-            IRestResponse restResponse = restClient.Execute(restRequest);
-
-            // Extracting output data from received response
-            string response = restResponse.Content;
-
-            // Verifiying reponse
-            if (!response.Contains("Invalid username/password supplied"))
-            {
-                Assert.Fail(response + "Correct username/password.");
+                Assert.Fail(response);
             }
         }
     }
@@ -163,7 +133,7 @@ namespace PetStore
 
         // Check for not allowed methods for user opeations
         [TestMethod]
-        public void geNotAllowed()
+        public void getNotAllowed()
         {
             for (int i = 0; i < variables.methods.GetLength(0); i++)
             {
@@ -216,6 +186,35 @@ namespace PetStore
             {
                 Assert.Fail(postResponse + getResponse + " Records are not the same.");
             }
+        }
+    }
+
+    [TestClass]
+    public class getInvalidURL
+    {
+        // New instance of Variables and Methods to get access to classes
+        Variables variables = new Variables();
+
+        // Check for invalid URL response -> expected 404
+        [TestMethod]
+        public void invalidURL()
+        {
+            // Creating Client connection and request to get data from server
+            RestClient restClient = new RestClient(variables.URL);
+            RestRequest restRequest = new RestRequest("invalidPath", Method.GET);
+
+            // Executing request to server and checking server response to the it
+            IRestResponse restResponse = restClient.Execute(restRequest);
+
+            // Extracting output data from received response
+            string response = restResponse.Content;
+
+            // Verifiying reponse
+            if (!response.Contains("404"))
+            {
+                Assert.Fail(response);
+            }
+
         }
     }
 }
