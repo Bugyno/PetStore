@@ -13,9 +13,9 @@ namespace PetStore
     {
         // Common variables
         public string URL = "https://petstore.swagger.io/v2/";
+        public object[] methods = new object[] { Method.PATCH, Method.COPY, Method.MERGE };
 
         // Test user variables
-        
         public int id = 1;
         public string username = "Bugyno";
         public string firstName = "Lukas";
@@ -26,11 +26,7 @@ namespace PetStore
         public string invalidPassword = "Heslo 321";
         public string phone = "0900000000";
         public int userStatus = 0;
-        //public string jsonUser = "{ "id":1, "username":"Bugyno", "firstName":"Lukas", "lastName":"Bugaj", "email":"email@email.com", "password":"Heslo123", "phone":"0900000000", "userStatus":0 }";
-
-
         public string userURLPath = "user/";
-        public object[] methods = new object[] { Method.PATCH, Method.COPY, Method.MERGE};
         public string nonExistingUserName = "Bugy";
 
         // Pet variables
@@ -51,6 +47,7 @@ namespace PetStore
         public string storeInventoryURLPath = "user/inventory";
     }
 
+    // Methods to handle tests
     class Methods
     {
         Variables variables = new Variables();
@@ -219,17 +216,17 @@ namespace PetStore
             {
                 using (var jsonTextWriter = new JsonTextWriter(stringWriter))
                 {
-                    JsonSerializer _serializer = new Newtonsoft.Json.JsonSerializer
+                    JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer
                     {
                         MissingMemberHandling = MissingMemberHandling.Ignore,
                         NullValueHandling = NullValueHandling.Include,
                         DefaultValueHandling = DefaultValueHandling.Include
                     };
 
-                    jsonTextWriter.Formatting = Formatting.Indented;
+                    jsonTextWriter.Formatting = Formatting.None;
                     jsonTextWriter.QuoteChar = '"';
 
-                    _serializer.Serialize(jsonTextWriter, obj);
+                    serializer.Serialize(jsonTextWriter, obj);
 
                     var result = stringWriter.ToString();
                     return result;

@@ -189,37 +189,29 @@ namespace PetStore
     [TestClass]
     public class checkPOSTandGET
     {
-        // New instance of Variables to get access to the class
+        // New instance of Variables and Methods to get access to classes
         Variables variables = new Variables();
         Methods methods = new Methods();
 
-        // Remove existing user -> expacting result 200
+        // Responses equals. Records are the same. Precondition: User has to be created.
         [TestMethod]
         public void compareRecords()
         {
-            // New instance of Variables and Methods to get access to classes
-            RestClient restClient = new RestClient(variables.URL);
-            RestRequest restRequest = new RestRequest(variables.userURLPath, Method.POST);
-
-            restRequest.AddJsonBody(new
+            // Storing responses to compare
+            string postResponse = methods.Serialize((new
             {
-                id = variables.id,
-                username = variables.username,
-                firstName = variables.firstName,
-                lastName = variables.lastName,
-                email = variables.email,
-                password = variables.password,
-                phone = variables.phone,
-                userStatus = variables.userStatus
-            });
-
-            string postResponse = methods.Serialize(restRequest);
-
-            // Executing request to server and checking server response to the it
-            IRestResponse restResponse = restClient.Execute(restRequest);
-
+                id=variables.id,
+                username=variables.username,
+                firstName=variables.firstName,
+                lastName=variables.lastName,
+                email=variables.email,
+                password=variables.password,
+                phone=variables.phone,
+                userStatus=variables.userStatus
+            }));
             string getResponse = methods.getUserInfo(variables.username);
 
+            // Verifying response
             if (!postResponse.Equals(getResponse))
             {
                 Assert.Fail(postResponse + getResponse + " Records are not the same.");
