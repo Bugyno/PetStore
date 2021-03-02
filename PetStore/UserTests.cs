@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using NUnit;
+using NUnit.Framework;
 using RestSharp;
 using System.IO;
 using System.Text;
@@ -13,6 +15,7 @@ namespace PetStore
         Variables variables = new Variables();
         Methods methods = new Methods();
 
+        [Test, Order(1)]
         // Successfull adding new user -> expecting response 200
         [TestMethod]
         public void addUser()
@@ -21,7 +24,7 @@ namespace PetStore
             // Verifiying reponse
             if (!response.Contains("200"))
             {
-                Assert.Fail(response);
+                NUnit.Framework.Assert.Fail(response);
             }
         }
     }
@@ -33,6 +36,7 @@ namespace PetStore
         Variables variables = new Variables();
         Methods methods = new Methods();
 
+        [Test, Order(3)]
         // Successfull updating user -> expecting response 200
         [TestMethod]
         public void updateExistingUserPassword()
@@ -42,7 +46,7 @@ namespace PetStore
             // Verifiying reponse
             if (!response.Contains("200"))
             {
-                Assert.Fail(response);
+                NUnit.Framework.Assert.Fail(response);
             }
         }
     }
@@ -54,6 +58,7 @@ namespace PetStore
         Variables variables = new Variables();
         Methods methods = new Methods();
 
+        [Test, Order(7)]
         // Remove existing user -> expacting result 200
         [TestMethod]
         public void removeExistingUser()
@@ -64,7 +69,7 @@ namespace PetStore
             // Verifying reponse
             if (!response.Contains("200"))
             {
-                Assert.Fail(response);
+                NUnit.Framework.Assert.Fail(response);
             }
         }
     }
@@ -75,6 +80,7 @@ namespace PetStore
         // New instance of Variables to get access to the class
         Variables variables = new Variables();
 
+        [Test, Order(4)]
         // Expecting result: User not found. Response 404
         [TestMethod]
         public void getUnknownUserInfo()
@@ -92,7 +98,7 @@ namespace PetStore
             // Verifiying reponse
             if (!response.Contains("User not found"))
             {
-                Assert.Fail(response);
+                NUnit.Framework.Assert.Fail(response);
             }
         }
     }
@@ -100,6 +106,7 @@ namespace PetStore
     [TestClass]
     public class getInfoAboutKnownUser
     {
+        [Test, Order(5)]
         // Expecting result: Info about user exists. Reponse 200
         [TestMethod]
         public void getUnknownUserInfo()
@@ -120,7 +127,7 @@ namespace PetStore
             // Verifiying reponse
             if (!response.Contains(variables.password))
             {
-                Assert.Fail(response);
+                NUnit.Framework.Assert.Fail(response);
             }
         }
     }
@@ -131,7 +138,8 @@ namespace PetStore
         // New instance of Variables and Methods to get access to classes
         Variables variables = new Variables();
 
-        // Check for not allowed methods for user opeations
+        [Test, Order(6)]
+        // Check for not allowed methods for user opeations -> expacting response 405
         [TestMethod]
         public void getNotAllowed()
         {
@@ -150,7 +158,7 @@ namespace PetStore
                 // Verifiying reponse
                 if (!response.Contains("405"))
                 {
-                    Assert.Fail(response + "Method " + variables.methods[i].ToString() + " allowed.");
+                    NUnit.Framework.Assert.Fail(response + "Method " + variables.methods[i].ToString() + " allowed.");
                 }
             }
         }
@@ -163,6 +171,7 @@ namespace PetStore
         Variables variables = new Variables();
         Methods methods = new Methods();
 
+        [Test, Order(2)]
         // Responses equals. Records are the same. Precondition: User has to be created.
         [TestMethod]
         public void compareRecords()
@@ -184,7 +193,7 @@ namespace PetStore
             // Verifying response
             if (!postResponse.Equals(getResponse))
             {
-                Assert.Fail(postResponse + getResponse + " Records are not the same.");
+                NUnit.Framework.Assert.Fail(postResponse + getResponse + " Records are not the same.");
             }
         }
     }
@@ -195,6 +204,7 @@ namespace PetStore
         // New instance of Variables and Methods to get access to classes
         Variables variables = new Variables();
 
+        [Test, Order(8)]
         // Check for invalid URL response -> expected 404
         [TestMethod]
         public void invalidURL()
@@ -212,9 +222,37 @@ namespace PetStore
             // Verifiying reponse
             if (!response.Contains("404"))
             {
-                Assert.Fail(response);
+                NUnit.Framework.Assert.Fail(response);
             }
 
+        }
+    }
+
+    [TestFixture]
+    public class TestUser 
+    {
+        [Test, Order(1)]
+        //[TestMethod]
+        public void AddUser()
+        {
+            addNewUser add = new addNewUser();
+            add.addUser();
+        }
+
+        [Test, Order(2)]
+        //[TestMethod]
+        public void validateUser()
+        {
+            checkPOSTandGET check = new checkPOSTandGET();
+            check.compareRecords();
+        }
+
+        [Test, Order(3)]
+        //[TestMethod]
+        public void updateUser()
+        {
+            updateUser update = new updateUser();
+            update.updateExistingUserPassword();
         }
     }
 }
