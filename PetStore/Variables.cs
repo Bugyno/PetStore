@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using RestSharp;
-using RestSharp.Serializers;
 
 namespace PetStore
 {
@@ -16,6 +12,7 @@ namespace PetStore
         public object[] methods = new object[] { Method.PATCH, Method.COPY, Method.MERGE };
 
         // Test user variables
+        public string userURLPath = "user/";
         public int id = 1;
         public string username = "Bugyno";
         public string firstName = "Lukas";
@@ -26,7 +23,6 @@ namespace PetStore
         public string invalidPassword = "Heslo 321";
         public string phone = "0900000000";
         public int userStatus = 0;
-        public string userURLPath = "user/";
 
         // Pet variables
         public string petURLPath = "pet/";
@@ -54,11 +50,12 @@ namespace PetStore
         // Remove object method
         public string removeObject(object urlPath, object removedObject)
         {
-            // New instance of Variables and Methods to get access to classes
+            // Creating Client connection and request to get data from server
             RestClient restClient = new RestClient(variables.URL);
             RestRequest restRequest = new RestRequest((String)urlPath + (String)removedObject, Method.DELETE);
 
-            //Creating updated testing input data in JSON format
+            // Creating updated testing input data in JSON format
+            // For user
             if (urlPath.ToString().Equals(variables.userURLPath))
             {
                 restRequest.AddJsonBody(new
@@ -66,15 +63,15 @@ namespace PetStore
                     username = (String)removedObject
                 });
             }
-
-            if (urlPath.ToString().Equals(variables.petURLPath))
+            // For store order
+            if (urlPath.ToString().Equals(variables.storeOrderURLPath))
             {
                 restRequest.AddJsonBody(new
                 {
                     orderId = (String)removedObject
                 });
             }
-
+            // For pet
             if (urlPath.ToString().Equals(variables.petURLPath))
             {
                 restRequest.AddHeader("api_key", variables.api_key);
@@ -87,6 +84,7 @@ namespace PetStore
             // Extracting output data from received response
             string response = restResponse.Content;
 
+            // Returning stored response
             return response;
         }
 
@@ -98,6 +96,7 @@ namespace PetStore
             RestRequest restRequest = new RestRequest((String)urlPath, Method.POST);
 
             //Creating testing input data in JSON format
+            // For user
             if (urlPath.ToString().Equals(variables.userURLPath))
             {
                 restRequest.AddJsonBody(new
@@ -113,6 +112,7 @@ namespace PetStore
                 });
             }
 
+            // For pet
             if (urlPath.ToString().Equals(variables.petURLPath))
             {
                 restRequest.AddJsonBody(new
@@ -134,6 +134,7 @@ namespace PetStore
             // Extracting output data from received response
             string response = restResponse.Content;
 
+            // Returning stored response
             return response;
         }
 
@@ -144,6 +145,7 @@ namespace PetStore
             RestClient restClient = new RestClient(variables.URL);
 
             //Creating updated testing input data in JSON format
+            // For user
             if (urlPath.ToString().Equals(variables.userURLPath))
             {
                 RestRequest restRequest = new RestRequest(variables.userURLPath + (String)updatedObject, Method.PUT);
@@ -165,8 +167,10 @@ namespace PetStore
                 // Extracting output data from received response
                 string response = restResponse.Content;
 
+                // Returning stored response
                 return response;
             }
+            // For pet
             else if (urlPath.ToString().Equals(variables.petURLPath))
             {
                 RestRequest restRequest = new RestRequest(variables.petURLPath, Method.PUT);
@@ -188,8 +192,10 @@ namespace PetStore
                 // Extracting output data from received response
                 string response = restResponse.Content;
 
+                // Returning stored response
                 return response;
             }
+            // Returning exception response
             else return "Something is wrong";
         }
 
@@ -205,6 +211,7 @@ namespace PetStore
             // Extracting output data from received response
             string response = restResponse.Content;
 
+            // Returning stored response
             return response;
         }
 
